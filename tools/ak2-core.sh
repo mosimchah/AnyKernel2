@@ -1,5 +1,3 @@
-## AnyKernel methods (DO NOT CHANGE)
-# set up extracted files and directories
 ramdisk=/tmp/anykernel/ramdisk;
 bin=/tmp/anykernel/tools;
 split_img=/tmp/anykernel/split_img;
@@ -7,6 +5,11 @@ patch=/tmp/anykernel/patch;
 
 chmod -R 755 $bin;
 mkdir -p $ramdisk $split_img;
+
+OUTFD=/proc/self/fd/$1;
+
+# ui_print <text>
+ui_print() { echo -e "ui_print $1\nui_print" > $OUTFD; }
 
 if [ "$is_slot_device" == 1 ]; then
   slot=$(getprop ro.boot.slot_suffix 2>/dev/null);
@@ -17,16 +20,8 @@ if [ "$is_slot_device" == 1 ]; then
   fi;
 fi;
 
-OUTFD=/proc/self/fd/$1;
-
-# ui_print <text>
-ui_print() { echo -e "ui_print $1\nui_print" > $OUTFD; }
-
-# contains <string> <substring>
-contains() { test "${1#*$2}" != "$1" && return 0 || return 1; }
-
-# dump boot and extract ramdisk
 dump_boot() {
+  ui_print "Dumping boot image...";
   if [ ! -e "$(echo $block | cut -d\  -f1)" ]; then
     ui_print " "; ui_print "Invalid partition. Aborting..."; exit 1;
   fi;
@@ -42,7 +37,7 @@ dump_boot() {
     $bin/unpackbootimg -i /tmp/anykernel/boot.img -o $split_img;
   fi;
   if [ $? != 0 ]; then
-    ui_print " "; ui_print "Dumping/splitting image failed. Aborting..."; exit 1;
+    ui_print " "; ui_print "Dumping boot image failed. Aborting..."; exit 1;
   fi;
   if [ -f "$bin/mkmtkhdr" ]; then
     dd bs=512 skip=1 conv=notrunc if=$split_img/boot.img-ramdisk.gz of=$split_img/temprd;
@@ -60,6 +55,7 @@ dump_boot() {
   mv -f $ramdisk /tmp/anykernel/rdtmp;
   mkdir -p $ramdisk;
   cd $ramdisk;
+  ui_print "Unpacking ramdisk...";
   gunzip -c $split_img/boot.img-ramdisk.gz | cpio -i;
   if [ $? != 0 -o -z "$(ls $ramdisk)" ]; then
     ui_print " "; ui_print "Unpacking ramdisk failed. Aborting..."; exit 1;
@@ -67,7 +63,6 @@ dump_boot() {
   cp -af /tmp/anykernel/rdtmp/* $ramdisk;
 }
 
-# repack ramdisk then build and write image
 write_boot() {
   cd $split_img;
   if [ -f *-cmdline ]; then
@@ -101,16 +96,17 @@ write_boot() {
   fi;
   for i in zImage zImage-dtb Image.gz Image Image-dtb Image.gz-dtb Image.bz2 Image.bz2-dtb Image.lzo Image.lzo-dtb Image.lzma Image.lzma-dtb Image.xz Image.xz-dtb Image.lz4 Image.lz4-dtb Image.fit; do
     if [ -f /tmp/anykernel/$i ]; then
+      ui_print "Kernel image: $i.";
       kernel=/tmp/anykernel/$i;
       break;
     fi;
   done;
   if [ ! "$kernel" ]; then
-    kernel=`ls *-zImage`;
-    kernel=$split_img/$kernel;
+    ui_print " "; ui_print "Kernel image not found. Aborting..."; exit 1;
   fi;
   for i in dtb dt.img; do
     if [ -f /tmp/anykernel/$i ]; then
+      ui_print "Device tree image: $i.";
       dtb="--dt /tmp/anykernel/$i";
       break;
     fi;
@@ -119,6 +115,7 @@ write_boot() {
     dtb=`ls *-dtb`;
     dtb="--dt $split_img/$dtb";
   fi;
+  ui_print "Repacking ramdisk...";
   if [ -f "$bin/mkbootfs" ]; then
     $bin/mkbootfs $ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   else
@@ -137,11 +134,12 @@ write_boot() {
       *) $bin/mkmtkhdr --kernel $kernel; kernel=$kernel-mtk;;
     esac;
   fi;
+  ui_print "Repacking boot image...";
   $bin/mkbootimg --kernel $kernel --ramdisk ramdisk-new.cpio.gz $second --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset "$tagsoff" --os_version "$osver" --os_patch_level "$oslvl" $hash $dtb --output boot-new.img;
   if [ $? != 0 ]; then
-    ui_print " "; ui_print "Repacking image failed. Aborting..."; exit 1;
+    ui_print " "; ui_print "Repacking boot image failed. Aborting..."; exit 1;
   elif [ `wc -c < boot-new.img` -gt `wc -c < boot.img` ]; then
-    ui_print " "; ui_print "New image larger than boot partition. Aborting..."; exit 1;
+    ui_print " "; ui_print "New boot image larger than partition. Aborting..."; exit 1;
   fi;
   if [ -f "$bin/futility" -a -d "$bin/chromeos" ]; then
     $bin/futility vbutil_kernel --pack boot-new-signed.img --keyblock $bin/chromeos/kernel.keyblock --signprivate $bin/chromeos/kernel_data_key.vbprivk --version 1 --vmlinuz boot-new.img --bootloader $bin/chromeos/empty --config $bin/chromeos/empty --arch arm --flags 0x1;
@@ -163,6 +161,7 @@ write_boot() {
     $bin/flash_erase $block 0 0;
     $bin/nandwrite -p $block /tmp/anykernel/boot-new.img;
   else
+    ui_print "Pushing boot image to partition...";
     dd if=/dev/zero of=$block;
     dd if=/tmp/anykernel/boot-new.img of=$block;
   fi;
@@ -296,5 +295,7 @@ patch_cmdline() {
   fi;
 }
 
-## end methods
-
+# insert_policy <source type> <target type> <class> <perm>
+insert_policy() {
+  $bin/sepolicy-inject -s $1 -t $2 -c $3 -p $4 -P sepolicy
+}

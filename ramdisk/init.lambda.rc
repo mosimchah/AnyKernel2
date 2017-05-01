@@ -1,0 +1,18 @@
+on boot
+    # Make sure the Wi-Fi driver is not loaded.
+    rmmod wlan.ko
+    # Mount the modules image at system/lib.
+    mount ext4 loop@/data/modules.img /system/lib/modules noatime
+
+# Post-boot tuning service.
+service lambda-post-boot /system/bin/sh /sbin/lambda-post_boot.sh
+    class late_start
+    user root
+    group root
+    disabled
+    seclabel u:r:init:s0
+    oneshot
+
+on property:sys.boot_completed=1
+    # Start the post-boot service after boot has finished.
+    start lambda-post-boot
