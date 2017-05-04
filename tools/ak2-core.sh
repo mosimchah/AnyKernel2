@@ -313,3 +313,16 @@ patch_cmdline() {
 insert_policy() {
   $bin/sepolicy-inject -s $1 -t $2 -c $3 -p $4 -P sepolicy
 }
+
+# patch_prop <prop file> <prop name> <new prop value>
+patch_prop() {
+  if [ -z "$(grep "^$2=" $1)" ]; then
+    echo -ne "\n$2=$3\n" >> $1;
+  else
+    line=`grep -n "^$2=" $1 | head -n1 | cut -d: -f1`;
+    sed -i "${line}s;.*;${2}=${3};" $1;
+  fi;
+}
+
+## end methods
+
