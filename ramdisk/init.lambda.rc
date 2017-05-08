@@ -3,6 +3,8 @@ on boot
     rmmod wlan.ko
     # Mount the modules image at system/lib.
     mount ext4 loop@/data/modules.img /system/lib/modules noatime
+    # Load the proper Wi-Fi driver.
+    insmod /system/lib/modules/wlan.ko
 
 # Post-boot tuning service.
 service lambda-post-boot /system/bin/sh /sbin/lambda-post_boot.sh
