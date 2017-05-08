@@ -11,6 +11,7 @@ device.name2=
 device.name3=
 device.name4=
 device.name5=
+permissive=1
 }
 
 block=/dev/block/bootdevice/by-name/boot;

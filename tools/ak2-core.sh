@@ -67,6 +67,14 @@ write_boot() {
   cd $split_img;
   if [ -f *-cmdline ]; then
     cmdline=`cat *-cmdline`;
+    if [ $permissive == 1 ]; then
+      if [[ cmdline == *"permissive"* ]]; then
+        ui_print "Permissive SELinux mode detected, skipping...";
+      else
+        ui_print "Setting SELinux to permissive mode...";
+        cmdline="$cmdline androidboot.selinux=permissive";
+      fi;
+    fi;
   fi;
   if [ -f *-board ]; then
     board=`cat *-board`;
