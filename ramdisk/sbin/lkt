@@ -16,16 +16,22 @@
 # itself. E.g.: 'lkt fine' will come up with the main options for tuning.
 
 # Global tunables for customization.
-char=λ
-iosched=cfq
-readahead=256
-gpupwrlvl=7
+# TODO: Source 'lambda.profile', will be a symlink of those values to max, min,
+# energy, etc. profiles in "/data/lambda/".
+if [ -f /data/lambda/lambda.profile ]; then
+	echo "[DEBUG] Using lambda.profile for tuning..." | tee /dev/kmsg
+	source /data/lambda/lambda.profile
+else
+	echo "[DEBUG] Using fallback values for tuning..." | tee /dev/kmsg
+	char=λ
+	iosched=cfq
+	readahead=256
+	fsync=Y
+	gpupwrlvl=7
+fi;
 
 # Message the kmsg device to indicate this script has run.
 echo "[$char] Entering speed-space dimension..." | tee /dev/kmsg
-
-# Show we'll be doing something pretty neat.
-echo "[$char] Fine tuning Kernel parameters..."
 
 # Set the read-ahead value for all MMC blocks.
 for block_device in /sys/block/*
@@ -45,6 +51,9 @@ fi;
 
 # Notify the system property that we changed the I/O scheduler.
 setprop sys.io.scheduler $iosched
+
+# Switch on/off filesystem sync unconditionally.
+echo "$fsync" > /sys/module/sync/parameters/fsync_enabled
 
 # Set the proper idle GPU frequency.
 echo "$gpupwrlvl" > /sys/class/kgsl/kgsl-3d0/default_pwrlevel

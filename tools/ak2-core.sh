@@ -67,7 +67,7 @@ write_boot() {
   cd $split_img;
   if [ -f *-cmdline ]; then
     cmdline=`cat *-cmdline`;
-    if [ $permissive == 1 ]; then
+    if [ $is_permissive == 1 ]; then
       if [[ cmdline == *"permissive"* ]]; then
         ui_print "Permissive SELinux mode detected, skipping...";
       else

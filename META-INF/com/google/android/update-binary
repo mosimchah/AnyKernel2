@@ -93,8 +93,15 @@ if [ $? != "0" ]; then
   abort;
 fi;
 
-ui_print "Copying modules image...";
-cp -f /tmp/anykernel/data/modules.img /data/modules.img
+if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.injection)" == 1 ]; then
+  ui_print "Removing /data files...";
+  rm -rf /data/lambda;
+  rm -f /data/modules.img
+
+  ui_print "Injecting /data files...";
+  cp -fvr /tmp/anykernel/data/* /data;
+  set_perm_recursive 0 0 0755 0755 /data/lambda;
+fi;
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.cleanup)" == 1 ]; then
   ui_print "Removing installation files...";

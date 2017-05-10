@@ -4,18 +4,19 @@
 
 properties() {
 do.devicecheck=1
+do.injection=1
 do.cleanup=1
 do.cleanuponabort=1
 device.name1=le_zl1
-device.name2=
-device.name3=
-device.name4=
-device.name5=
-permissive=1
+device.name2=zl1
+device.name3=pro3
+device.name4=ZL1_CN
+device.name5=ZL1_NA
 }
 
 block=/dev/block/bootdevice/by-name/boot;
 is_slot_device=0;
+is_permissive=1;
 
 . /tmp/anykernel/tools/ak2-core.sh;
 

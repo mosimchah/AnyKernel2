@@ -1,3 +1,13 @@
+# Copyright (c) 2017, Lambda Kernel Project.
+#
+#              \
+#              /\
+#             /  \
+#            /    \
+#
+# Lambda Kernel ".rc" Init Script - "lkrc"
+#
+
 on boot
     # Make sure the Wi-Fi driver is not loaded.
     rmmod wlan.ko
@@ -6,15 +16,15 @@ on boot
     # Load the proper Wi-Fi driver.
     insmod /system/lib/modules/wlan.ko
 
-# Post-boot tuning service.
-service lambda-post-boot /system/bin/sh /sbin/lambda-post_boot.sh
+# Lambda Kernel tuning script - HOORAY!
+service lambda_tuner /sbin/lkt
     class late_start
     user root
     group root
-    disabled
     seclabel u:r:init:s0
     oneshot
+    disabled
 
 on property:sys.boot_completed=1
-    # Start the post-boot service after boot has finished.
-    start lambda-post-boot
+    # Run the tuning script after boot has finished.
+    start lambda_tuner
