@@ -1,5 +1,5 @@
-char=λ
-iosched=zen
+spec=2
+iosched=noop
 readahead=256
 fsync=N
 gpupwrlvl=7
