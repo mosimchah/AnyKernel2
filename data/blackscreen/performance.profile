@@ -1,5 +1,5 @@
 spec=1
-iosched=zen
+iosched=fiops
 readahead=256
 fsync=N
 gpupwrlvl=7

@@ -1,43 +1,32 @@
 #!/system/bin/sh
 #
 # Copyright - Ícaro Hoff <icarohoff@gmail.com>
-#
-#              \
-#              /\
-#             /  \
-#            /    \
-#
-# Lambda Kernel Tuning - "lkt"
-#
-
-# The ultimate "Lambda" character.
-char=λ
 
 # "Current" and "default" profiles.
-current=/data/lambda/lambda.profile
-default=/data/lambda/balance.profile
+current=/data/blackscreen/blackscreen.profile
+default=/data/blackscreen/balance.profile
 
 # Import the "global tunables" for our Kernel modification API...
 if [ -L $current ]; then
-	# ...from "current" profile after first "lkt profile" usage.
+	# ...from "current" profile after first "bkt profile" usage.
 	source $current
 else
-	# ...from "balance" profile if "lkt profile" was never used.
+	# ...from "balance" profile if "bkt profile" was never used.
 	source $default
 fi
 
 # Message the kmsg device to indicate this script is running.
-echo "[$char] Entering <$1> dimension..." | tee /dev/kmsg
+echo "Entering <$1> dimension..." | tee /dev/kmsg
 
-# Lambda profiles to be loaded from "lkt" or "spectrum".
+# blackscreen profiles to be loaded from "bkt" or "spectrum".
 profiler() {
 	profile=$1
-	if [ -f /data/lambda/${profile}.profile ]; then
-		echo "[$char] Switching to <$profile> profile..." | tee /dev/kmsg
-		source /data/lambda/${profile}.profile
-		ln -s -f /data/lambda/${profile}.profile $current
+	if [ -f /data/blackscreen/${profile}.profile ]; then
+		echo "Switching to <$profile> profile..." | tee /dev/kmsg
+		source /data/blackscreen/${profile}.profile
+		ln -s -f /data/blackscreen/${profile}.profile $current
 	else
-		echo "[$char] This profile is not available!" | tee /dev/kmsg
+		echo "This profile is not available!" | tee /dev/kmsg
 	fi
 }
 
@@ -70,12 +59,12 @@ tuning() {
 }
 
 spectrum() {
-	echo "[$char] Setting up spectrum support..." | tee /dev/kmsg
+	echo "Setting up spectrum support..." | tee /dev/kmsg
 	setprop spectrum.support 1
-	setprop persist.spectrum.kernel "Lambda"
+	setprop persist.spectrum.kernel "blackscreen"
 	# Set the spectrum profile if not already set.
 	if [ ! -f /data/property/persist.spectrum.profile ]; then
-		echo "[$char] Setting spectrum profile to <$spec>..." | tee /dev/kmsg
+		echo "Setting spectrum profile to <$spec>..." | tee /dev/kmsg
 		setprop persist.spectrum.profile "$spec"
 	fi
 }

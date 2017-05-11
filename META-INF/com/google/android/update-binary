@@ -31,23 +31,7 @@ if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.cleanuponabort)" == 1 ]; the
 fi;
 
 show_progress 1.34 4;
-ui_print " ";
-ui_print "-------------- ~ ------ ~ --------------";
-ui_print "                                        ";
-ui_print "                   \                    ";
-ui_print "                   /\                   ";
-ui_print "                  /  \                  ";
-ui_print "                 /    \                 ";
-ui_print "                                        ";
-ui_print "-------------- ~ Kernel ~ --------------";
-ui_print " ";
-ui_print "Today, we are entering a space which is ";
-ui_print "speed-space. This new other time is that";
-ui_print "of electronic transmission, of high-tech";
-ui_print "machines, and therefore, man is present ";
-ui_print "in this sort of time, not via his       ";
-ui_print "physical presence, but via programming. ";
-ui_print " ";
+ui_print "Begining instalation of BlackScreen";
 cleanup;
 mkdir -p /tmp/anykernel/bin;
 cd /tmp/anykernel;
@@ -63,6 +47,7 @@ umount /system;
 mount -o ro -t auto /system;
 mount /data;
 test -f /system/system/build.prop && root=/system;
+ui_print "getting ready to brick";
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
   ui_print "Checking device...";
@@ -111,6 +96,5 @@ fi;
 umount /system;
 umount /data;
 ui_print " ";
-ui_print "Enjoy your brand new Kernel!";
-ui_print "Don't forget to K.I.S.S.";
+ui_print "Enjoy your Black Screen!!";
 ui_print " ";

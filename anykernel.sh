@@ -1,6 +1,6 @@
 # AnyKernel2 Ramdisk Mod Script
 # osm0sis @ xda-developers
-# GalaticStryder for Lambda Kernel
+# Mosimchah for BlackScreen Kernel
 
 properties() {
 do.devicecheck=1
@@ -27,7 +27,7 @@ dump_boot;
 ui_print "Modifying ramdisk contents...";
 
 backup_file init.qcom.rc;
-insert_line init.qcom.rc "lambda" after "import init.qcom.factory.rc" "import init.lambda.rc";
+insert_line init.qcom.rc "blackscreen" after "import init.qcom.factory.rc" "import init.blackscreen.rc";
 
 backup_file init.target.rc;
 remove_line init.target.rc "wait /dev/block/bootdevice/by-name/cache";
