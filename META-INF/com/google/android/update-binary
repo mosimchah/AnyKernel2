@@ -63,6 +63,8 @@ bb=/tmp/anykernel/tools/busybox;
 chmod 755 $bb;
 $bb chmod -R 755 /tmp/anykernel/tools /tmp/anykernel/bin;
 
+ui_print "BlackScreen";
+
 if [ -f /tmp/anykernel/banner ]; then
   while IFS='' read -r line || $bb [[ -n "$line" ]]; do
     ui_print "$line";
@@ -170,5 +172,5 @@ test "$savedpre" && export LD_PRELOAD="$savedpre";
 unmount_all;
 
 ui_print " ";
-ui_print " ";
+ui_print "Enjoy your Black Screen!";
 ui_print "Done!";
