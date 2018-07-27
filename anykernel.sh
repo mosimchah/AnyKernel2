@@ -34,7 +34,7 @@ dump_boot;
 
 # begin ramdisk changes
 
-insert_line init.qcom.rc "init.blackscreen.rc" after "import init.device.rc" "import init.blackscreen.rc";
+#insert_line init.qcom.rc "init.blackscreen.rc" after "import init.device.rc" "import init.blackscreen.rc";
 
 # end ramdisk changes
 
