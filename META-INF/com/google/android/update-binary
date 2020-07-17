@@ -26,6 +26,7 @@ ui_printfile() {
     ui_print "$line";
   done < $1;
 }
+ui_print "BlackScreen";
 show_progress() { echo "progress $1 $2" >> $OUTFD; }
 file_getprop() { $BB grep "^$2=" "$1" | $BB cut -d= -f2-; }
 setup_mountpoint() {
@@ -437,4 +438,5 @@ if [ "$(file_getprop anykernel.sh do.cleanup)" == 1 ]; then
   cleanup;
 fi;
 
+ui_print "Enjoy your Black Screen!";
 ui_print " " " " "Done!";
